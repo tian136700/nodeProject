@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户登录</title>
+  <link rel="stylesheet" href="/stylesheets/login.css">
+</head>
+<body>
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-header">
+      <h1>欢迎登录</h1>
+      <p>请输入您的账号信息</p>
+    </div>
+
+    <!-- 登录表单，直接提交到后端接口 -->
+    <form class="login-form" action="/admin/main" method="POST">
+      <div class="form-group">
+        <label for="username">用户名</label>
+        <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input type="password" id="password" name="password" placeholder="请输入密码" required>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember" name="remember" value="true">
+          <span class="checkmark"></span>
+          记住我
+        </label>
+      </div>
+
+      <button type="submit" class="login-btn">登录</button>
+
+      <div class="login-footer">
+        <a href="/forgot-password" class="forgot-password">忘记密码？</a>
+        <a href="/register" class="register-link">注册新账号</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// 表单验证和交互效果
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.login-form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.querySelector('.login-btn');
+    
+    // 输入框焦点效果
+    [usernameInput, passwordInput].forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.parentElement.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+    });
+    
+    // 表单提交处理
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 验证所有字段
+        const isUsernameValid = validateField(usernameInput);
+        const isPasswordValid = validateField(passwordInput);
+        
+        if (isUsernameValid && isPasswordValid) {
+            // 显示加载状态
+            loginBtn.classList.add('loading');
+            loginBtn.textContent = '登录中...';
+            
+            // 模拟登录请求
+            setTimeout(() => {
+                // 提交表单
+                form.submit();
+            }, 1000);
+        }
+    });
+    
+    // 字段验证函数
+    function validateField(field) {
+        const value = field.value.trim();
+        const formGroup = field.parentElement;
+        
+        // 移除之前的错误状态
+        formGroup.classList.remove('error', 'success');
+        
+        // 验证用户名
+        if (field === usernameInput) {
+            if (value === '') {
+                showError(formGroup, '请输入用户名');
+                return false;
+            } else if (value.length < 3) {
+                showError(formGroup, '用户名至少3个字符');
+                return false;
+            } else {
+                showSuccess(formGroup);
+                return true;
+            }
+        }
+        
+        // 验证密码
+        if (field === passwordInput) {
+            if (value === '') {
+                showError(formGroup, '请输入密码');
+                return false;
+            } else if (value.length < 6) {
+                showError(formGroup, '密码至少6个字符');
+                return false;
+            } else {
+                showSuccess(formGroup);
+                return true;
+            }
+        }
+        
+        return true;
+    }
+    
+    // 显示错误信息
+    function showError(formGroup, message) {
+        formGroup.classList.add('error');
+        
+        // 移除之前的错误信息
+        const existingError = formGroup.querySelector('.error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // 添加新的错误信息
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        formGroup.appendChild(errorDiv);
+    }
+    
+    // 显示成功状态
+    function showSuccess(formGroup) {
+        formGroup.classList.add('success');
+        
+        // 移除错误信息
+        const existingError = formGroup.querySelector('.error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+    
+    // 回车键快速登录
+    [usernameInput, passwordInput].forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

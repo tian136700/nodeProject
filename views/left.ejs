@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>左侧菜单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "微软雅黑", sans-serif;
+            background: #1a1a1a;
+            color: white;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Logo区域 */
+        .logo-section {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            flex: 1;
+        }
+
+        .logo-text h3 {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* 导航菜单 */
+        .nav-menu {
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: #007bff;
+            border-radius: 6px;
+            margin: 0 10px;
+        }
+
+        .nav-icon {
+            width: 24px;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .nav-text {
+            flex: 1;
+        }
+
+        .nav-arrow {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* 子菜单 */
+        .submenu {
+            display: none;
+            background: #2a2a2a;
+            margin-left: 20px;
+        }
+
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu-item {
+            padding: 14px 20px;
+            color: #ccc;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .submenu-item:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .submenu-icon {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo区域 -->
+    <div class="logo-section">
+        <div class="logo"></div>
+        <div class="logo-text">
+            <h3>小鹿线</h3>
+            <p>XIAOLUXIAN</p>
+        </div>
+    </div>
+
+    <!-- 导航菜单 -->
+    <nav class="nav-menu">
+        <div class="nav-item">
+            <div class="nav-link active" onclick="toggleSubmenu('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">首页</span>
+                <span class="nav-arrow">▼</span>
+            </div>
+            <div class="submenu" id="home-submenu">
+                <div class="submenu-item">
+                    <a href="/bannerList" target="right" style="text-decoration: none; color: inherit;">
+                        <span class="submenu-icon">📊</span>
+                        banner图
+                    </a>
+                </div>
+                <div class="submenu-item">
+                    <span class="submenu-icon">📅</span>
+                    开班计划
+                </div>
+                <div class="submenu-item">
+                    <span class="submenu-icon">🎓</span>
+                    课程体系
+                </div>
+                <div class="submenu-item">
+                    <span class="submenu-icon">💎</span>
+                    企业级项目
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <div class="nav-link">
+                <span class="nav-icon">✅</span>
+                <span class="nav-text">成功就业</span>
+                <span class="nav-arrow">></span>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <div class="nav-link">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">关于我们</span>
+                <span class="nav-arrow">></span>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // 切换子菜单显示/隐藏
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId + '-submenu');
+            const isVisible = submenu.classList.contains('show');
+            
+            // 隐藏所有子菜单
+            document.querySelectorAll('.submenu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+            
+            // 如果当前子菜单是隐藏的，则显示它
+            if (!isVisible) {
+                submenu.classList.add('show');
+            }
+        }
+
+        // 点击子菜单项
+        document.querySelectorAll('.submenu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 这里可以添加跳转逻辑
+                console.log('点击了:', this.textContent.trim());
+            });
+        });
+    </script>
+</body>
+</html>

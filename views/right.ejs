@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>后台欢迎页</title>
+  <style>
+    body {
+      margin: 0;
+      /* 设置背景图片，覆盖整个页面 */
+      background-image: url('/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "微软雅黑", sans-serif;
+    }
+
+    /* 文字容器，添加半透明背景让文字更清晰 */
+    .welcome-text {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+    }
+
+    .welcome-text h1 {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+
+    .welcome-text p {
+      font-size: 18px;
+      margin: 10px 0;
+      color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-text">
+    <h1>后台管理系统</h1>
+    <p>欢迎使用管理系统</p>
+    <p>请从左侧菜单选择功能</p>
+  </div>
+</body>
+</html>

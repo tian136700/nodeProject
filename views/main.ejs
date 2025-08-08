@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <title>小鹿后台管理系统</title>
+    <link rel="stylesheet" href="/stylesheets/common.css" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+        .left-panel {
+            width: 240px;
+            border-right: 1px solid #ccc;
+        }
+        .right-panel {
+            flex: 1;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="left-panel">
+        <iframe src="/left" name="left"></iframe>
+    </div>
+    <div class="right-panel">
+        <iframe src="/right" name="right"></iframe>
+    </div>
+</div>
+</body>
+</html>

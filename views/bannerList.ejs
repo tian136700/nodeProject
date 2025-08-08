@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner图管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "微软雅黑", sans-serif;
+            background: #1a1a1a;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 顶部控制区域 */
+        .control-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* 下拉选择框 */
+        .select-field {
+            position: relative;
+            min-width: 150px;
+        }
+
+        .select-field select {
+            width: 100%;
+            padding: 10px 15px;
+            background: white;
+            border: none;
+            border-radius: 6px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 搜索输入框 */
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input input {
+            width: 100%;
+            padding: 10px 15px;
+            background: white;
+            border: none;
+            border-radius: 6px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .search-input input::placeholder {
+            color: #999;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-search {
+            background: #007bff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-search:hover {
+            background: #0056b3;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #333;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #444;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .data-table tr:hover {
+            background: #333;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background: #007bff;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background: #0056b3;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-size-selector {
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .page-size-selector:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .page-btn {
+            background: #444;
+            border: 1px solid #666;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .page-btn:hover {
+            background: #555;
+            border-color: #777;
+        }
+
+        .page-btn.active {
+            background: #007bff;
+            border-color: #007bff;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-input {
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+            width: 60px;
+            text-align: center;
+        }
+
+        .page-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .add-btn {
+            background: #444;
+            border: 1px solid #666;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-btn:hover {
+            background: #555;
+            border-color: #777;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #444;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px dashed #555;
+        }
+
+        .file-upload-btn:hover {
+            background: #0056b3;
+            border-color: #007bff;
+        }
+
+        .file-info {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* 删除确认框样式 */
+        .delete-confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .delete-confirm-overlay.show {
+            opacity: 1;
+        }
+
+        .delete-confirm-modal {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .delete-confirm-overlay.show .delete-confirm-modal {
+            transform: scale(1);
+        }
+
+        .delete-confirm-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .delete-confirm-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff4757;
+            margin-bottom: 15px;
+        }
+
+        .delete-confirm-message {
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .delete-confirm-warning {
+            font-size: 14px;
+            color: #ff4757;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .delete-confirm-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete-confirm {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete-confirm:hover {
+            background: #e74c3c;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete-confirm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 当前信息显示样式 */
+        .current-info {
+            background: #333;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #555;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #007bff;
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .info-value {
+            color: #ccc;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .current-image-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-image-preview img {
+            border: 2px solid #555;
+            transition: all 0.3s ease;
+        }
+
+        .current-image-preview img:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+
+        #noImageText {
+            color: #999;
+            font-style: italic;
+        }
+
+        .file-preview {
+            background: #333;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #555;
+        }
+
+        .file-preview img {
+            border: 2px solid #007bff;
+            transition: all 0.3s ease;
+        }
+
+        .file-preview img:hover {
+            transform: scale(1.05);
+        }
+
+        /* 编辑弹窗特殊样式 */
+        .edit-modal {
+            max-width: 450px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            border: 1px solid #444;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .edit-modal .modal-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            margin: -30px -30px 25px -30px;
+            padding: 25px 30px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 2px solid #0056b3;
+        }
+
+        .edit-modal .modal-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .edit-modal .modal-close {
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .edit-modal .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .edit-modal .form-group {
+            margin-bottom: 25px;
+        }
+
+        .edit-modal .form-label {
+            color: #007bff;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .edit-modal .form-input {
+            background: linear-gradient(145deg, #333, #2a2a2a);
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 15px 18px;
+            font-size: 15px;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .edit-modal .form-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .edit-modal .form-input[readonly] {
+            background: linear-gradient(145deg, #2a2a2a, #222);
+            color: #007bff;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+
+        .file-upload-container {
+            background: linear-gradient(145deg, #333, #2a2a2a);
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-container:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .file-upload-btn {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 15px 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .file-upload-btn:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .upload-icon {
+            font-size: 18px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+        }
+
+        .edit-modal .file-info {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 8px;
+            color: #007bff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .edit-modal .modal-footer {
+            margin: 30px -30px -30px -30px;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+            border-radius: 0 0 12px 12px;
+            border-top: 1px solid #444;
+        }
+
+        .edit-modal .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .edit-modal .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .edit-modal .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .edit-modal .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .edit-modal .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        /* 消息提示样式 */
+        .message-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .message-toast.show {
+            transform: translateX(0);
+        }
+
+        .message-toast.success {
+            border-left: 4px solid #2ed573;
+        }
+
+        .message-toast.error {
+            border-left: 4px solid #ff4757;
+        }
+
+        .message-icon {
+            font-size: 18px;
+        }
+
+        .message-text {
+            color: white;
+            font-size: 14px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .control-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+
+            .modal {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
+
+            .delete-confirm-modal {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .delete-confirm-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 顶部控制区域 -->
+<div class="control-section">
+    <!-- 搜索表单 -->
+    <form action="/like" method="GET" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%;">
+        <!-- 下拉选择框 -->
+        <div class="select-field">
+            <select name="status" id="statusFilter">
+                <option value="" <%= typeof status !== 'undefined' && status === '' ? 'selected' : '' %>>请选择</option>
+                <option value="all" <%= typeof status !== 'undefined' && status === 'all' ? 'selected' : '' %>>全部</option>
+                <option value="active" <%= typeof status !== 'undefined' && status === 'active' ? 'selected' : '' %>>启用</option>
+                <option value="inactive" <%= typeof status !== 'undefined' && status === 'inactive' ? 'selected' : '' %>>禁用</option>
+            </select>
+        </div>
+
+        <!-- 搜索输入框 -->
+        <div class="search-input">
+            <input type="text" name="search" id="searchInput" placeholder="请输入搜索关键词" value="<%= typeof search !== 'undefined' ? search : '' %>">
+        </div>
+
+        <!-- 搜索按钮 -->
+        <button type="submit" class="btn-search" title="搜索">
+            🔍
+        </button>
+
+        <!-- 添加按钮 -->
+        <button type="button" class="btn btn-primary" id="addBtn">
+            添加
+        </button>
+    </form>
+</div>
+
+<!-- 表格区域 -->
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>图片名称</th>
+            <th>图片路径</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% bannerList.forEach(function (item){%>
+        <tr>
+            <td><%=item.id%></td>
+            <td><%=item.image_name%></td>
+            <td><%=item.image_url%></td>
+            <td>
+                <div class="action-buttons">
+                    <div class="btn-edit" title="编辑">
+                        ✏️
+                    </div>
+                    <div class="btn-delete" title="删除">
+                        🗑️
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <% })%>
+        </tbody>
+    </table>
+</div>
+
+<!-- 分页区域 -->
+<div class="pagination-container">
+    <div class="pagination-info">
+        共<%=pager.totalCount%>条  第<%=pager.startIndex%>-<%=pager.endIndex%>条  共<%=pager.totalPages%>页
+    </div>
+
+    <div class="pagination-controls">
+        <select class="page-size-selector" id="pageSizeSelector">
+            <option value="10" <%= pager.pageSize === 10 ? 'selected' : '' %>>10条/页</option>
+            <option value="20" <%= pager.pageSize === 20 ? 'selected' : '' %>>20条/页</option>
+            <option value="50" <%= pager.pageSize === 50 ? 'selected' : '' %>>50条/页</option>
+            <option value="100" <%= pager.pageSize === 100 ? 'selected' : '' %>>100条/页</option>
+        </select>
+
+        <div class="pagination-buttons">
+            <!-- 上一页按钮 -->
+            <button class="page-btn <%= pager.currentPage <= 1 ? 'disabled' : '' %>" 
+                    onclick="goToPage(<%= pager.currentPage - 1 %>)" 
+                    <%= pager.currentPage <= 1 ? 'disabled' : '' %>>&lt;</button>
+            
+            <!-- 页码按钮 -->
+            <% pager.pages.forEach(function(page) { %>
+                <% if (page === '...') { %>
+                    <span class="page-btn disabled">...</span>
+                <% } else { %>
+                    <button class="page-btn <%= page === pager.currentPage ? 'active' : '' %>" 
+                            onclick="goToPage(<%= page %>)"><%= page %></button>
+                <% } %>
+            <% }); %>
+            
+            <!-- 下一页按钮 -->
+            <button class="page-btn <%= pager.currentPage >= pager.totalPages ? 'disabled' : '' %>" 
+                    onclick="goToPage(<%= pager.currentPage + 1 %>)" 
+                    <%= pager.currentPage >= pager.totalPages ? 'disabled' : '' %>>&gt;</button>
+        </div>
+
+        <div class="page-input-container">
+            <span>前往</span>
+            <input type="number" class="page-input" id="pageInput" value="<%= pager.currentPage %>" min="1" max="<%= pager.totalPages %>">
+            <span>页</span>
+            <button class="add-btn" onclick="goToSpecificPage()">+</button>
+        </div>
+    </div>
+</div>
+
+<!-- 添加Banner弹窗 -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">添加banner图</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+
+        <form id="addBannerForm" method="post" action="/addBanner" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">图片名称</label>
+                <input type="text" class="form-input" name="imageName" placeholder="请输入图片名称" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">图片路径</label>
+                <div class="file-upload">
+                    <input type="file" name="imageFile" accept="image/*" onchange="updateFileInfo()">
+                    <div class="file-upload-btn" onclick="document.querySelector('input[name=\"imageFile\"]').click()">
+                    选择文件
+                </div>
+            </div>
+            <div class="file-info" id="fileInfo">未选择任何文件</div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button type="submit" class="btn btn-primary">确定</button>
+    </div>
+    </form>
+</div>
+</div>
+
+<!-- 编辑Banner弹窗 -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal edit-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">修改操作</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+
+        <form id="editBannerForm" method="post" action="/update" enctype="multipart/form-data">
+            <input type="hidden" name="oldImageUrl" value="">
+            
+            <div class="form-group">
+                <label class="form-label">ID</label>
+                <input type="text" class="form-input" name="id" id="editIdDisplay" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">图标名称</label>
+                <input type="text" class="form-input" name="imageName" placeholder="请输入图标名称" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">图片路径</label>
+                <div class="file-upload-container">
+                    <div class="file-upload">
+                        <input type="file" name="imageFile" accept="image/*" onchange="updateEditFileInfo()">
+                        <div class="file-upload-btn" onclick="document.querySelector('#editBannerForm input[name=\"imageFile\"]').click()">
+                            <span class="upload-icon">📁</span>
+                            <span class="upload-text">选择文件</span>
+                        </div>
+                    </div>
+                    <div class="file-info" id="editFileInfo">未选择任何文件</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                <button type="submit" class="btn btn-primary">确定</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 当前页面参数
+    const currentPage = <%= pager.currentPage %>;
+    const totalPages = <%= pager.totalPages %>;
+    const pageSize = <%= pager.pageSize %>;
+    const search = '<%= typeof search !== "undefined" ? search : "" %>';
+    const status = '<%= typeof status !== "undefined" ? status : "" %>';
+
+    // 显示弹窗
+    document.getElementById('addBtn').addEventListener('click', function() {
+        document.getElementById('addModal').classList.add('show');
+    });
+
+    // 关闭弹窗
+    function closeModal() {
+        document.getElementById('addModal').classList.remove('show');
+        // 清空表单
+        document.getElementById('addBannerForm').reset();
+        document.getElementById('fileInfo').textContent = '未选择任何文件';
+    }
+
+    // 关闭编辑弹窗
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+        // 清空表单
+        document.getElementById('editBannerForm').reset();
+        document.getElementById('editFileInfo').textContent = '未选择任何文件';
+    }
+
+    // 点击遮罩层关闭弹窗
+    document.getElementById('addModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // 点击遮罩层关闭编辑弹窗
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    // 更新文件信息
+    function updateFileInfo() {
+        const fileInput = document.querySelector('input[name="imageFile"]');
+        const fileInfo = document.getElementById('fileInfo');
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileInfo.textContent = `已选择: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        } else {
+            fileInfo.textContent = '未选择任何文件';
+        }
+    }
+
+    // 更新编辑弹窗文件信息
+    function updateEditFileInfo() {
+        const fileInput = document.querySelector('#editBannerForm input[name="imageFile"]');
+        const fileInfo = document.getElementById('editFileInfo');
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileInfo.textContent = `已选择: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        } else {
+            fileInfo.textContent = '未选择任何文件';
+        }
+    }
+
+    // 表单提交事件
+    document.getElementById('addBannerForm').addEventListener('submit', function(e) {
+        const imageName = this.querySelector('input[name="imageName"]').value;
+        const imageFile = this.querySelector('input[name="imageFile"]').files[0];
+
+        if (!imageName.trim()) {
+            e.preventDefault();
+            alert('请输入图片名称');
+            return;
+        }
+
+        if (!imageFile) {
+            e.preventDefault();
+            alert('请选择图片文件');
+            return;
+        }
+
+        // 表单验证通过，允许提交
+        console.log('表单提交:', {
+            imageName: imageName,
+            fileName: imageFile.name,
+            fileSize: imageFile.size
+        });
+    });
+
+    /**
+     * 构建查询参数
+     * @param {Object} params - 参数对象
+     * @returns {string} 查询字符串
+     */
+    function buildQueryString(params) {
+        const queryParams = new URLSearchParams();
+        
+        if (params.page) queryParams.append('page', params.page);
+        if (params.pageSize) queryParams.append('pageSize', params.pageSize);
+        if (params.search) queryParams.append('search', params.search);
+        if (params.status) queryParams.append('status', params.status);
+        
+        return queryParams.toString();
+    }
+
+    /**
+     * 跳转到指定页面
+     * @param {number} page - 目标页码
+     */
+    function goToPage(page) {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+
+        const params = {
+            page: page,
+            pageSize: pageSize,
+            search: search,
+            status: status
+        };
+
+        const queryString = buildQueryString(params);
+        window.location.href = '?' + queryString;
+    }
+
+    /**
+     * 跳转到指定页码（通过输入框）
+     */
+    function goToSpecificPage() {
+        const pageInput = document.getElementById('pageInput');
+        const page = parseInt(pageInput.value);
+
+        if (page >= 1 && page <= totalPages) {
+            goToPage(page);
+        } else {
+            alert('请输入有效的页码（1-' + totalPages + '）');
+            pageInput.value = currentPage;
+        }
+    }
+
+    /**
+     * 改变每页显示条数
+     */
+    function changePageSize() {
+        const pageSizeValue = document.getElementById('pageSizeSelector').value;
+        
+        const params = {
+            page: 1, // 改变每页条数时重置到第一页
+            pageSize: pageSizeValue,
+            search: search,
+            status: status
+        };
+
+        const queryString = buildQueryString(params);
+        window.location.href = '?' + queryString;
+    }
+
+    // 每页条数变化事件
+    document.getElementById('pageSizeSelector').addEventListener('change', changePageSize);
+
+    // 编辑功能
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const id = row.cells[0].textContent;
+            const imageName = row.cells[1].textContent;
+            const imageUrl = row.cells[2].textContent;
+            
+            // 填充编辑表单
+            document.getElementById('editIdDisplay').value = id;
+            document.querySelector('#editBannerForm input[name="imageName"]').value = imageName;
+            document.querySelector('#editBannerForm input[name="oldImageUrl"]').value = imageUrl;
+            
+            // 重置文件信息
+            document.getElementById('editFileInfo').textContent = '未选择任何文件';
+            
+            // 显示编辑弹窗
+            document.getElementById('editModal').classList.add('show');
+        });
+    });
+
+    // 删除功能
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const id = row.cells[0].textContent;
+            const imageName = row.cells[1].textContent;
+            
+            // 显示自定义删除确认框
+            showDeleteConfirm(imageName, id);
+        });
+    });
+
+    // 显示删除确认框
+    function showDeleteConfirm(imageName, id) {
+        // 创建确认框HTML
+        const confirmHTML = `
+            <div class="delete-confirm-overlay">
+                <div class="delete-confirm-modal">
+                    <div class="delete-confirm-icon">🗑️</div>
+                    <h3 class="delete-confirm-title">确认删除</h3>
+                    <p class="delete-confirm-message">确定要删除 "<strong>${imageName}</strong>" 这个banner吗？</p>
+                    <p class="delete-confirm-warning">此操作不可撤销！</p>
+                    <div class="delete-confirm-buttons">
+                        <button class="btn-cancel" onclick="hideDeleteConfirm()">取消</button>
+                        <button class="btn-delete-confirm" onclick="confirmDelete('${id}')">删除</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加到页面
+        document.body.insertAdjacentHTML('beforeend', confirmHTML);
+        
+        // 添加动画效果
+        setTimeout(() => {
+            document.querySelector('.delete-confirm-overlay').classList.add('show');
+        }, 10);
+    }
+
+    // 隐藏删除确认框
+    function hideDeleteConfirm() {
+        const overlay = document.querySelector('.delete-confirm-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                overlay.remove();
+            }, 300);
+        }
+    }
+
+    // 确认删除
+    function confirmDelete(id) {
+        // 显示加载状态
+        const deleteBtn = document.querySelector('.btn-delete-confirm');
+        const originalText = deleteBtn.textContent;
+        deleteBtn.textContent = '删除中...';
+        deleteBtn.disabled = true;
+
+        // 发送删除请求
+        fetch('/del', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 显示成功消息
+                showMessage('删除成功！', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                showMessage('删除失败：' + (data.message || '未知错误'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除请求出错:', error);
+            showMessage('删除失败：网络错误', 'error');
+        })
+        .finally(() => {
+            // 恢复按钮状态
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+            hideDeleteConfirm();
+        });
+    }
+
+    // 显示消息提示
+    function showMessage(message, type) {
+        const messageHTML = `
+            <div class="message-toast ${type}">
+                <div class="message-icon">${type === 'success' ? '✅' : '❌'}</div>
+                <div class="message-text">${message}</div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', messageHTML);
+        
+        setTimeout(() => {
+            document.querySelector('.message-toast').classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            const toast = document.querySelector('.message-toast');
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
+</body>
+</html>
